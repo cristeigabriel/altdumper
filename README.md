@@ -73,5 +73,46 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
     </details>
   </details>
 
+## Example config (CS:GO)
+- Remember that, if you want to use an external config, you'll have to change the DLL path by hand. There is currently no such feature as '**edit**' mode, anywho, this shouldn't be much of an issue.
+
+```
+{
+   "D:\\SteamLibrary\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\\bin\\client.dll":{
+      "convars":null,
+      "signatures":null,
+      "string-search":{
+         "ppEngineClient":{
+            "dereferences":1,
+            "padding":10,
+            "reference-instance":0,
+            "string":"VEngineClient014"
+         }
+      }
+   },
+   "D:\\SteamLibrary\\steamapps\\common\\Counter-Strike Global Offensive\\bin\\engine.dll":{
+      "convars":{
+         "ppCmdRateCVar":{
+            "name":"cl_cmdrate",
+            "server-bounded":true
+         },
+         "ppAspectRatioCVar":{
+            "name":"r_aspectratio",
+            "server-bounded":false
+         }
+      },
+      "signatures":{
+         "pGlobalVars":{
+            "dereferences":1,
+            "nth-match":0,
+            "padding":1,
+            "signature":"68 ? ? ? ? FF 35 ? ? ? ? FF 10 8A"
+         }
+      },
+      "string-search":null
+   }
+}
+```
+
 ## License
 [WTFPL](https://github.com/cristeigabriel/altdumper/blob/main/LICENSE) 
