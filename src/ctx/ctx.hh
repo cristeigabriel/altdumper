@@ -90,7 +90,7 @@ struct context {
     }
 
     inline auto get_at(size_t indice) const {
-        return _bytes + indice;
+        return (uintptr_t)_bytes + indice;
     }
 
     inline auto get_opcode(size_t indice) const {
