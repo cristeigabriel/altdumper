@@ -74,7 +74,10 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
   </details>
 
 ## Example config (CS:GO)
-- Remember that, if you want to use an external config, you'll have to change the DLL path by hand. There is currently no such feature as '**edit**' mode, anywho, this shouldn't be much of an issue.
+
+---
+- You'll have to change the **DLL** paths by hand, currently, if you want to use this, or any other config that you didn't configure! There is currently no '**edit**' mode, anywho, it shouldn't be an issue.
+---
 
 ```
 {
