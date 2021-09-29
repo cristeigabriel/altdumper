@@ -89,12 +89,12 @@ struct context {
         return _bytes;
     }
 
-    inline auto get_at(size_t indice) const {
-        return (uintptr_t)_bytes + indice;
+    inline auto get_at(uintptr_t n) const {
+        return (uintptr_t)_bytes + n;
     }
 
-    inline auto get_opcode(size_t indice) const {
-        return *(uint8_t*)(get_at(indice));
+    inline auto get_byte(uintptr_t n) const {
+        return *(uint8_t*)(get_at(n));
     }
 
     inline auto get_size() const {
@@ -109,11 +109,11 @@ struct context {
         return _nt_headers;
     }
 
-    inline const auto& get_sections() const {
+    [[nodiscard]] inline const auto& get_sections() const {
         return _sections;
     }
 
-    inline const auto& get_section(const std::string& name) const {
+    [[nodiscard]] inline const auto& get_section(const std::string& name) const {
         return _sections.at(name);
     }
 
@@ -135,9 +135,20 @@ struct context {
      * @param size String size
      * @param section Section to scan for references
      * @param reference_instance N-th reference
-     * @return std::optional<ptr> 
+     * @return std::optional<ptr> Contained pointer
      */
     [[nodiscard]] std::optional<ptr> find_string(const char* bytes, size_t size, const std::string& section, size_t reference_instance) const;
+
+    /**
+     * @brief CS:GO/Source-Engine specific - Find ConVar with string by constructor, return pointer
+     * 
+     * @param bytes The string/convar name itself
+     * @param size String size
+     * @param server_bounded Constructor type, non-server-bounded example (CS:GO):
+     * r_aspectratio, server-bounded example: cl_cmdrate
+     * @return std::optional<ptr> Contained pointer
+     */
+    [[nodiscard]] std::optional<ptr> find_convar(const char* bytes, size_t size, bool server_bounded) const;
 };
 }  // namespace modules
 // ===========================================

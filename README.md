@@ -62,9 +62,15 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
 - Misc scanning
   <details>
   
-  ---
-  - Work in progress.
-  ---
+  - ConVar scanning
+    <details>
+    Prompts you to input the following:
+
+    - Name of ConVar.
+    - Whether is it server bounded or not (to deduce the constructor).
+      - A server-bounded ConVar example is: **cl_cmdrate**.
+      - A non-server-boudned ConVar example is: **r_aspectratio**.
+    </details>
   </details>
 
 ## License

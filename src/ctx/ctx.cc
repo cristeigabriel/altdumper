@@ -110,7 +110,7 @@ std::optional<ptr> context::find_signature(const int* bytes, size_t size, const 
     for (auto i = start; i < (start + end); ++i) {
         auto found = true;
         for (auto j = 0; j < size; ++j) {
-            if (get_opcode(i + j) != bytes[j] && bytes[j] != -1) {
+            if (get_byte(i + j) != bytes[j] && bytes[j] != -1) {
                 found = false;
                 break;
             }
@@ -147,5 +147,30 @@ std::optional<ptr> context::find_string(const char* bytes, size_t size, const st
     }
 
     return std::nullopt;
+}
+
+std::optional<ptr> context::find_convar(const char* bytes, size_t size, bool server_bounded) const {
+    size_t count                       = 0;
+    std::optional<ptr> constructor_ref = find_string(bytes, size, ".text", count++);
+
+    if (constructor_ref.has_value()) {
+        int pad        = (server_bounded ? -6 : 4);
+        uint8_t opcode = (server_bounded ? 0x68 : 0xE8);
+
+        while (constructor_ref.value().get_byte(pad) != opcode) {
+            constructor_ref = find_string(bytes, size, ".text", count++);
+        }
+
+        ptr bounded_found = constructor_ref.value().followed_until(0xC7, server_bounded ? ptr::direction::forward : ptr::direction::back);
+        auto final_found  = (server_bounded ? bounded_found : bounded_found.followed_until(0xB9, ptr::direction::forward)).get<uintptr_t>();
+
+        if (!ptr::valid(final_found)) {
+            return std::nullopt;
+        }
+
+        return ptr(final_found + (1 + (int)(server_bounded)));
+    } else {
+        return std::nullopt;
+    }
 }
 // ===========================================

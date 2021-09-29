@@ -56,7 +56,7 @@ namespace json {
          * @param padding 
          * @param dereferences 
          */
-        signature(std::string&& signature, size_t nth_match, int padding, int dereferences) {
+        [[nodiscard]] signature(std::string&& signature, size_t nth_match, int padding, int dereferences) {
             _signature    = std::move(signature);
             _nth_match    = nth_match;
             _padding      = padding;
@@ -68,7 +68,7 @@ namespace json {
          * 
          * @param json Entry
          */
-        signature(const nlohmann::json& json) {
+        [[nodiscard]] signature(const nlohmann::json& json) {
             _signature    = std::move(json["signature"].get<std::string>());
             _nth_match    = json["nth-match"].get<size_t>();
             _padding      = json["padding"].get<int>();
@@ -90,7 +90,7 @@ namespace json {
         // UTILITY
         //
 
-        inline auto get_signature() const {
+        [[nodiscard]] inline auto get_signature() const {
             return _signature;
         }
 
@@ -110,7 +110,7 @@ namespace json {
         // EXPORT
         //
 
-        static nlohmann::json to_json(signature&& object) {
+        [[nodiscard]] static nlohmann::json to_json(signature&& object) {
             nlohmann::json json;
 
             json["signature"]    = object.get_signature();
@@ -138,7 +138,7 @@ namespace json {
          * @param padding 
          * @param dereferences 
          */
-        string_search(std::string&& string, size_t reference_instance, int padding, int dereferences) {
+        [[nodiscard]] string_search(std::string&& string, size_t reference_instance, int padding, int dereferences) {
             _string             = std::move(string);
             _reference_instance = reference_instance;
             _padding            = padding;
@@ -150,7 +150,7 @@ namespace json {
          * 
          * @param json Entry
          */
-        string_search(const nlohmann::json& json) {
+        [[nodiscard]] string_search(const nlohmann::json& json) {
             _string             = std::move(json["string"].get<std::string>());
             _reference_instance = json["reference-instance"].get<size_t>();
             _padding            = json["padding"].get<int>();
@@ -172,7 +172,7 @@ namespace json {
         // UTILITY
         //
 
-        inline auto get_string() const {
+        [[nodiscard]] inline auto get_string() const {
             return _string;
         }
 
@@ -192,13 +192,76 @@ namespace json {
         // EXPORT
         //
 
-        static nlohmann::json to_json(string_search&& object) {
+        [[nodiscard]] static nlohmann::json to_json(string_search&& object) {
             nlohmann::json json;
 
             json["string"]             = object.get_string();
             json["reference-instance"] = object.get_reference_instance();
             json["padding"]            = object.get_padding();
             json["dereferences"]       = object.get_dereferences();
+
+            return json;
+        }
+    };
+
+    struct convar {
+        //
+        // CONSTRUCTORS
+        //
+
+        convar() = default;
+
+        /**
+         * @brief Construct a new convar object from data
+         * 
+         * @param name ConVar name
+         * @param server_bounded Server Bounded constructor?
+         */
+        [[nodiscard]] convar(std::string&& name, bool server_bounded) {
+            _name           = std::move(name);
+            _server_bounded = server_bounded;
+        }
+
+        /**
+         * @brief Construct a new convar object from JSON
+         * 
+         * @param json Entry
+         */
+        [[nodiscard]] convar(const nlohmann::json& json) {
+            _name           = std::move(json["name"].get<std::string>());
+            _server_bounded = json["server-bounded"].get<int>();
+        }
+
+      private:
+        //
+        // DATA
+        //
+
+        std::string _name;
+        bool _server_bounded;
+
+      public:
+        //
+        // UTILITY
+        //
+
+        [[nodiscard]] inline auto get_name() const {
+            return _name;
+        }
+
+        inline auto get_server_bounded() const {
+            return _server_bounded;
+        }
+
+        //
+        // EXPORT
+        //
+
+        [[nodiscard]] static nlohmann::json to_json(convar&& object) {
+            nlohmann::json json;
+
+            json["name"]           = object.get_name();
+            json["server-bounded"] = object.get_server_bounded();
 
             return json;
         }
@@ -347,6 +410,29 @@ namespace handlers {
 
         section[entry] = utility::json::string_search::to_json({std::move(string), reference_instance, padding, dereferences});
     }
+
+    auto add_convar(nlohmann::json& section) {
+        std::cout << "Entry:\n";
+        std::string entry = {};
+        std::getline(std::cin >> std::ws, entry);
+
+        std::cout << "Name:\n";
+        std::string name = {};
+        std::getline(std::cin >> std::ws, name);
+
+    server_bounded_label:
+        std::cout << "Server Bounded:\n";
+        bool server_bounded = false;
+        std::cin >> server_bounded;
+
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<int>::max(), '\n');
+            goto server_bounded_label;
+        }
+
+        section[entry] = utility::json::convar::to_json({std::move(name), server_bounded});
+    }
 }  // namespace handlers
 [[nodiscard]] int exit() {
     system("pause");
@@ -415,16 +501,18 @@ here:
         // initialize sections
         auto& signatures    = node["signatures"];
         auto& string_search = node["string-search"];
+        auto& convars       = node["convars"];
 
     restart:
         // TODO: misc push-levels for ConVars, NetVars (CS:GO/...)
         enum push_levels {
             go_back = 1,
             add_signature,
-            add_string_search
+            add_string_search,
+            add_convar
         };
 
-        std::cout << "Pushing to \"" << name << "\".\nTo go back to module prompting, input \"" << push_levels::go_back << "\". To import a signature, input \"" << push_levels::add_signature << "\". To import a string search, input \"" << push_levels::add_string_search << "\".\n";
+        std::cout << "Pushing to \"" << name << "\".\nTo go back to module prompting, input \"" << push_levels::go_back << "\". To import a signature, input \"" << push_levels::add_signature << "\". To import a string search, input \"" << push_levels::add_string_search << "\".\nThe following are also available (tested for CS:GO only): To input a ConVar, input \"" << push_levels::add_convar << "\".\n";
 
         int indice = -1;
         std::cin >> indice;
@@ -439,6 +527,9 @@ here:
             } break;
             case push_levels::add_string_search: {
                 handlers::add_string_search(string_search);
+            } break;
+            case push_levels::add_convar: {
+                handlers::add_convar(convars);
             } break;
         }
 
@@ -479,6 +570,7 @@ here:
 
             const auto& signatures    = value["signatures"];
             const auto& string_search = value["string-search"];
+            const auto& convars       = value["convars"];
 
             for (const auto& [key, value] : signatures.items()) {
                 const auto& data = utility::json::signature(value);
@@ -533,6 +625,22 @@ here:
                     address = (ptr.value().padded(data.get_padding()).dereferenced(data.get_dereferences()).get() - (uintptr_t)dll.get_bytes());
                 } else {
                     throw std::runtime_error("Failed finding string.");
+                }
+
+                map_entry_key[key] = address;
+            }
+
+            for (const auto& [key, value] : convars.items()) {
+                const auto& data = utility::json::convar(value);
+
+                uintptr_t address = 0;
+
+                auto&& name     = data.get_name();
+                const auto& ptr = dll.find_convar(name.c_str(), name.size(), data.get_server_bounded());
+                if (ptr.has_value()) {
+                    address = (ptr.value().get() - (uintptr_t)dll.get_bytes());
+                } else {
+                    throw std::runtime_error("Failed finding convar.");
                 }
 
                 map_entry_key[key] = address;

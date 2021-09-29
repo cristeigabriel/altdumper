@@ -101,10 +101,11 @@ struct ptr {
     /**
      * @brief Get the byte at current address
      * 
+     * @param n Indice from address
      * @return 
      */
-    inline auto get_byte() const {
-        return *(uint8_t*)_address;
+    inline auto get_byte(int n = 0) const {
+        return *(uint8_t*)((uintptr_t)_address + n);
     }
 
     /**
