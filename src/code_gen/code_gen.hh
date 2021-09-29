@@ -121,7 +121,6 @@ struct context {
     constexpr auto break_line(size_t n = 1) {
         for (auto i = 0; i < n; ++i) {
             _file << '\n';
-            indent();
         }
     }
 
