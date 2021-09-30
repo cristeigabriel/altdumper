@@ -150,8 +150,8 @@ std::optional<ptr> context::find_string(const char* bytes, size_t size, const st
 }
 
 std::optional<ptr> context::find_convar(const char* bytes, size_t size, bool server_bounded) const {
-    size_t count                       = 0;
-    std::optional<ptr> constructor_ref = find_string(bytes, size, ".text", count++);
+    size_t count         = 0;
+    auto constructor_ref = find_string(bytes, size, ".text", count++);
 
     if (constructor_ref.has_value()) {
         int pad        = (server_bounded ? -6 : 4);
@@ -161,8 +161,8 @@ std::optional<ptr> context::find_convar(const char* bytes, size_t size, bool ser
             constructor_ref = find_string(bytes, size, ".text", count++);
         }
 
-        ptr bounded_found = constructor_ref.value().followed_until(0xC7, server_bounded ? ptr::direction::forward : ptr::direction::back);
-        auto final_found  = (server_bounded ? bounded_found : bounded_found.followed_until(0xB9, ptr::direction::forward)).get<uintptr_t>();
+        auto bounded_found = constructor_ref.value().followed_until(0xC7, server_bounded ? ptr::direction::forward : ptr::direction::back);
+        auto final_found   = (server_bounded ? bounded_found : bounded_found.followed_until(0xB9, ptr::direction::forward)).get<uintptr_t>();
 
         if (!ptr::valid(final_found)) {
             return std::nullopt;
@@ -170,7 +170,9 @@ std::optional<ptr> context::find_convar(const char* bytes, size_t size, bool ser
 
         return ptr(final_found + (1 + (int)(server_bounded)));
     } else {
-        return std::nullopt;
+        throw std::runtime_error("Failed finding .text.");
     }
+
+    return std::nullopt;
 }
 // ===========================================

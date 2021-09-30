@@ -122,7 +122,7 @@ namespace json {
         }
     };
 
-    // TODO: recursive follow tables
+    // TODO: follow tables
     struct string_search {
         //
         // CONSTRUCTORS
@@ -134,12 +134,14 @@ namespace json {
          * @brief Construct a new string search object from data
          * 
          * @param string Null terminated
+         * @param section Section to scan
          * @param reference_instance 
          * @param padding 
          * @param dereferences 
          */
-        [[nodiscard]] string_search(std::string&& string, size_t reference_instance, int padding, int dereferences) {
+        [[nodiscard]] string_search(std::string&& string, std::string&& section, size_t reference_instance, int padding, int dereferences) {
             _string             = std::move(string);
+            _section            = std::move(section);
             _reference_instance = reference_instance;
             _padding            = padding;
             _dereferences       = dereferences;
@@ -152,6 +154,7 @@ namespace json {
          */
         [[nodiscard]] string_search(const nlohmann::json& json) {
             _string             = std::move(json["string"].get<std::string>());
+            _section            = std::move(json["section"].get<std::string>());
             _reference_instance = json["reference-instance"].get<size_t>();
             _padding            = json["padding"].get<int>();
             _dereferences       = json["dereferences"].get<int>();
@@ -163,6 +166,7 @@ namespace json {
         //
 
         std::string _string        = {};
+        std::string _section       = {};
         size_t _reference_instance = 0;
         int _padding               = 0;
         int _dereferences          = 0;
@@ -174,6 +178,10 @@ namespace json {
 
         [[nodiscard]] inline auto get_string() const {
             return _string;
+        }
+
+        [[nodiscard]] inline auto get_section() const {
+            return _section;
         }
 
         inline auto get_reference_instance() const {
@@ -196,6 +204,7 @@ namespace json {
             nlohmann::json json;
 
             json["string"]             = object.get_string();
+            json["section"]            = object.get_section();
             json["reference-instance"] = object.get_reference_instance();
             json["padding"]            = object.get_padding();
             json["dereferences"]       = object.get_dereferences();
@@ -375,6 +384,10 @@ namespace handlers {
         std::string string = {};
         std::getline(std::cin >> std::ws, string);
 
+        std::cout << "Scan section:\n";
+        std::string scan_section = {};
+        std::getline(std::cin >> std::ws, scan_section);
+
     reference_instance_label:
         std::cout << "Reference instance:\n";
         size_t reference_instance = 0;
@@ -408,7 +421,7 @@ namespace handlers {
             goto dereferences_label;
         }
 
-        section[entry] = utility::json::string_search::to_json({std::move(string), reference_instance, padding, dereferences});
+        section[entry] = utility::json::string_search::to_json({std::move(string), std::move(scan_section), reference_instance, padding, dereferences});
     }
 
     auto add_convar(nlohmann::json& section) {
@@ -504,7 +517,7 @@ here:
         auto& convars       = node["convars"];
 
     restart:
-        // TODO: misc push-levels for ConVars, NetVars (CS:GO/...)
+        // TODO: add netvars to misc scanner
         enum push_levels {
             go_back = 1,
             add_signature,
@@ -620,7 +633,7 @@ here:
                 uintptr_t address = 0;
 
                 auto&& str      = data.get_string();
-                const auto& ptr = dll.find_string(str.c_str(), str.size(), ".text", data.get_reference_instance());
+                const auto& ptr = dll.find_string(str.c_str(), str.size(), data.get_section(), data.get_reference_instance());
                 if (ptr.has_value()) {
                     address = (ptr.value().padded(data.get_padding()).dereferenced(data.get_dereferences()).get() - (uintptr_t)dll.get_bytes());
                 } else {

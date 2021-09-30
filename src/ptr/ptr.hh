@@ -117,8 +117,8 @@ struct ptr {
      */
     inline auto follow_until(uint8_t byte, direction where) {
         do {
-            pad(where == direction::back ? -1 : 1);
-        } while (get_byte() != byte && valid());
+            pad(where == direction::forward ? 1 : -1);
+        } while ((get_byte() != byte) && valid());
     }
 
     /**

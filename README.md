@@ -81,40 +81,48 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
 
 ```
 {
-   "D:\\SteamLibrary\\steamapps\\common\\Counter-Strike Global Offensive\\csgo\\bin\\client.dll":{
-      "convars":null,
-      "signatures":null,
-      "string-search":{
-         "ppEngineClient":{
-            "dereferences":1,
-            "padding":10,
-            "reference-instance":0,
-            "string":"VEngineClient014"
-         }
-      }
-   },
    "D:\\SteamLibrary\\steamapps\\common\\Counter-Strike Global Offensive\\bin\\engine.dll":{
       "convars":{
-         "ppCmdRateCVar":{
+         "pp_cmdrate_cvar":{
             "name":"cl_cmdrate",
             "server-bounded":true
          },
-         "ppAspectRatioCVar":{
+         "pp_aspect_ratio_cvar":{
             "name":"r_aspectratio",
             "server-bounded":false
          }
       },
       "signatures":{
-         "pGlobalVars":{
+         "p_global_vars":{
             "dereferences":1,
             "nth-match":0,
             "padding":1,
             "signature":"68 ? ? ? ? FF 35 ? ? ? ? FF 10 8A"
          }
       },
-      "string-search":null
+      "string-search":{
+         "p_engine_client":{
+            "dereferences":0,
+            "padding":-8,
+            "reference-instance":0,
+            "section":".data",
+            "string":"VEngineClient014"
+         },
+         "ppp_localize":{
+            "dereferences":0,
+            "padding":-4,
+            "reference-instance":0,
+            "section":".data",
+            "string":"Localize_001"
+         }
+      }
    }
 }
+```
+
+Or
+
+```
 ```
 
 ## License
