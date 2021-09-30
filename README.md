@@ -55,6 +55,7 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
   Prompts you to input the following:
 
   - String to find in **.rdata**. Input is null terminated.
+  - Section where to scan for the references.
   - Reference instance (N-th reference in **.text** of the address where our string is stored).
   - Padding (to skip over reference pointer, you would input 4).
   - Dereferencing (from padding).
@@ -118,11 +119,6 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
       }
    }
 }
-```
-
-Or
-
-```
 ```
 
 ## License
