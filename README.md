@@ -121,10 +121,5 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
 }
 ```
 
-Or
-
-```
-```
-
 ## License
 [WTFPL](https://github.com/cristeigabriel/altdumper/blob/main/LICENSE) 
