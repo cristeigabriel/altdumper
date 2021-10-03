@@ -366,7 +366,12 @@ namespace winapi {
             SHGetPathFromIDListA(pidl, folder);
             CoTaskMemFree(pidl);
 
-            return std::string {folder};
+            auto str = std::string(folder);
+            if (!str.ends_with("\\")) {
+                str.append("\\");
+            }
+
+            return str;
         }
 
         return std::string {};
