@@ -88,42 +88,47 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
 
 ```
 {
-   "D:\\SteamLibrary\\steamapps\\common\\Counter-Strike Global Offensive\\bin\\engine.dll":{
-      "convars":{
-         "pp_cmdrate_cvar":{
-            "name":"cl_cmdrate",
-            "server-bounded":true
-         },
-         "pp_aspect_ratio_cvar":{
-            "name":"r_aspectratio",
-            "server-bounded":false
-         }
+  "D:\\SteamLibrary\\steamapps\\common\\Counter-Strike Global Offensive\bin\\engine.dll": {
+    "convars": {
+      "pp_cmdrate_cvar": {
+        "name": "cl_cmdrate",
+        "server-bounded": true
       },
-      "signatures":{
-         "p_global_vars":{
-            "dereferences":1,
-            "nth-match":0,
-            "padding":1,
-            "signature":"68 ? ? ? ? FF 35 ? ? ? ? FF 10 8A"
-         }
-      },
-      "string-search":{
-         "p_engine_client":{
-            "dereferences":0,
-            "padding":-8,
-            "reference-instance":0,
-            "section":".data",
-            "string":"VEngineClient014"
-         },
-         "ppp_localize":{
-            "dereferences":0,
-            "padding":-4,
-            "reference-instance":0,
-            "section":".data",
-            "string":"Localize_001"
-         }
+      "pp_aspect_ratio_cvar": {
+        "name": "r_aspectratio",
+        "server-bounded": false
       }
-   }
+    },
+    "procedures": {
+      "p_create_interface": {
+        "name": "CreateInterface"
+      }
+    },
+    "signatures": {
+      "p_global_vars": {
+        "dereferences": 1,
+        "nth-match": 0,
+        "padding": 1,
+        "signature": "68 ? ? ? ? FF 35 ? ? ? ? FF 10 8A"
+      }
+    },
+    "string-search": {
+      "p_engine_client": {
+        "dereferences": 0,
+        "padding": -8,
+        "reference-instance": 0,
+        "section": ".data",
+        "string": "VEngineClient014"
+      },
+      "ppp_localize": {
+        "dereferences": 0,
+        "padding": -4,
+        "reference-instance": 0,
+        "section": ".data",
+        "string": "Localize_001"
+      }
+    }
+  }
 }
 ```
 
