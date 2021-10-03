@@ -88,7 +88,7 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
 
 ```
 {
-  "D:\\SteamLibrary\\steamapps\\common\\Counter-Strike Global Offensive\bin\\engine.dll": {
+  "D:\\SteamLibrary\\steamapps\\common\\Counter-Strike Global Offensive\\bin\\engine.dll": {
     "convars": {
       "pp_cmdrate_cvar": {
         "name": "cl_cmdrate",
