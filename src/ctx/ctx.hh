@@ -140,6 +140,14 @@ struct context {
     [[nodiscard]] std::optional<ptr> find_string(const char* bytes, size_t size, const std::string& section, size_t reference_instance) const;
 
     /**
+     * @brief Find exported procedure address in DLL
+     * 
+     * @param name Procedure name
+     * @return std::optional<ptr> Contained pointer
+     */
+    [[nodiscard]] std::optional<ptr> find_procedure(const std::string& name) const;
+
+    /**
      * @brief CS:GO/Source-Engine specific - Find ConVar with string by constructor, return pointer
      * 
      * @param bytes The string/convar name itself

@@ -275,6 +275,60 @@ namespace json {
             return json;
         }
     };
+
+    struct procedure {
+        //
+        // CONSTRUCTORS
+        //
+
+        procedure() = default;
+
+        /**
+         * @brief Construct a new procedure object from data
+         * 
+         * @param name 
+         */
+        [[nodiscard]] procedure(std::string&& name) {
+            _name = std::move(name);
+        }
+
+        /**
+         * @brief Construct a new procedure object from JSON
+         * 
+         * @param json Entry
+         */
+        [[nodiscard]] procedure(const nlohmann::json& json) {
+            _name = std::move(json["name"].get<std::string>());
+        }
+
+      private:
+        //
+        // DATA
+        //
+
+        std::string _name;
+
+      public:
+        //
+        // UTILITY
+        //
+
+        [[nodiscard]] inline auto get_name() const {
+            return _name;
+        }
+
+        //
+        // EXPORT
+        //
+
+        [[nodiscard]] static nlohmann::json to_json(procedure&& object) {
+            nlohmann::json json;
+
+            json["name"] = object.get_name();
+
+            return json;
+        }
+    };
 }  // namespace json
 namespace winapi {
     [[nodiscard]] auto get_file_from_prompt() {
@@ -424,6 +478,18 @@ namespace handlers {
         section[entry] = utility::json::string_search::to_json({std::move(string), std::move(scan_section), reference_instance, padding, dereferences});
     }
 
+    auto add_procedure(nlohmann::json& section) {
+        std::cout << "Entry:\n";
+        std::string entry = {};
+        std::getline(std::cin >> std::ws, entry);
+
+        std::cout << "Name:\n";
+        std::string name = {};
+        std::getline(std::cin >> std::ws, name);
+
+        section[entry] = utility::json::procedure::to_json({std::move(name)});
+    }
+
     auto add_convar(nlohmann::json& section) {
         std::cout << "Entry:\n";
         std::string entry = {};
@@ -514,6 +580,7 @@ here:
         // initialize sections
         auto& signatures    = node["signatures"];
         auto& string_search = node["string-search"];
+        auto& procedures    = node["procedures"];
         auto& convars       = node["convars"];
 
     restart:
@@ -522,10 +589,11 @@ here:
             go_back = 1,
             add_signature,
             add_string_search,
+            add_procedure,
             add_convar
         };
 
-        std::cout << "Pushing to \"" << name << "\".\nTo go back to module prompting, input \"" << push_levels::go_back << "\". To import a signature, input \"" << push_levels::add_signature << "\". To import a string search, input \"" << push_levels::add_string_search << "\".\nThe following are also available (tested for CS:GO only): To input a ConVar, input \"" << push_levels::add_convar << "\".\n";
+        std::cout << "Pushing to \"" << name << "\".\nTo go back to module prompting, input \"" << push_levels::go_back << "\". To import a signature, input \"" << push_levels::add_signature << "\". To import a string search, input \"" << push_levels::add_string_search << "\". To import a procedure, input \"" << push_levels::add_procedure << "\".\nThe following are also available (tested for CS:GO only): To input a ConVar, input \"" << push_levels::add_convar << "\".\n";
 
         int indice = -1;
         std::cin >> indice;
@@ -540,6 +608,9 @@ here:
             } break;
             case push_levels::add_string_search: {
                 handlers::add_string_search(string_search);
+            } break;
+            case push_levels::add_procedure: {
+                handlers::add_procedure(procedures);
             } break;
             case push_levels::add_convar: {
                 handlers::add_convar(convars);
@@ -583,6 +654,7 @@ here:
 
             const auto& signatures    = value["signatures"];
             const auto& string_search = value["string-search"];
+            const auto& procedures    = value["procedures"];
             const auto& convars       = value["convars"];
 
             for (const auto& [key, value] : signatures.items()) {
@@ -638,6 +710,22 @@ here:
                     address = (ptr.value().padded(data.get_padding()).dereferenced(data.get_dereferences()).get() - (uintptr_t)dll.get_bytes());
                 } else {
                     throw std::runtime_error("Failed finding string.");
+                }
+
+                map_entry_key[key] = address;
+            }
+
+            for (const auto& [key, value] : procedures.items()) {
+                const auto& data = utility::json::procedure(value);
+
+                uintptr_t address = 0;
+
+                auto&& name     = data.get_name();
+                const auto& ptr = dll.find_procedure(name);
+                if (ptr.has_value()) {
+                    address = (ptr.value().get() - (uintptr_t)dll.get_bytes());
+                } else {
+                    throw std::runtime_error("Failed finding procedure.");
                 }
 
                 map_entry_key[key] = address;

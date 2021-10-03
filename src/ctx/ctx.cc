@@ -149,6 +149,15 @@ std::optional<ptr> context::find_string(const char* bytes, size_t size, const st
     return std::nullopt;
 }
 
+std::optional<ptr> context::find_procedure(const std::string& name) const {
+    auto procedure = ptr(GetProcAddress((HMODULE)get_bytes(), name.c_str()));
+    if (procedure.valid()) {
+        return procedure;
+    }
+
+    return std::nullopt;
+}
+
 std::optional<ptr> context::find_convar(const char* bytes, size_t size, bool server_bounded) const {
     size_t count         = 0;
     auto constructor_ref = find_string(bytes, size, ".text", count++);
@@ -162,13 +171,13 @@ std::optional<ptr> context::find_convar(const char* bytes, size_t size, bool ser
         }
 
         auto bounded_found = constructor_ref.value().followed_until(0xC7, server_bounded ? ptr::direction::forward : ptr::direction::back);
-        auto final_found   = (server_bounded ? bounded_found : bounded_found.followed_until(0xB9, ptr::direction::forward)).get<uintptr_t>();
+        auto final_found   = (server_bounded ? bounded_found : bounded_found.followed_until(0xB9, ptr::direction::forward));
 
-        if (!ptr::valid(final_found)) {
+        if (!final_found.valid()) {
             return std::nullopt;
         }
 
-        return ptr(final_found + (1 + (int)(server_bounded)));
+        return final_found.padded(1 + (int)server_bounded);
     } else {
         throw std::runtime_error("Failed finding .text.");
     }

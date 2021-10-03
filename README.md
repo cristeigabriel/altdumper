@@ -60,6 +60,12 @@ Simple, fully external, smart, fast, JSON-configurated, **feature-rich** Windows
   - Padding (to skip over reference pointer, you would input 4).
   - Dereferencing (from padding).
   </details>
+- Procedure scannign
+  <details>
+  Prompts you to input the following:
+  
+  - Export procedure name.
+  </details>
 - Misc scanning
   <details>
   
